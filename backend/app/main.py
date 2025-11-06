@@ -49,6 +49,7 @@ def on_startup():
     except Exception as e:
       # In debug, it's useful to see this in logs, but avoid crashing startup
       print(f"DB init error: {e}")
+        
 '''
 if __name__ == "__main__":
     import uvicorn
