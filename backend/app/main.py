@@ -8,8 +8,11 @@ from .api.api_v1.api import api_router
 from .db.connection import init_db
 
 # Create necessary directories
-os.makedirs(settings.INPUT_DIR, exist_ok=True)
-os.makedirs(settings.OUTPUT_DIR, exist_ok=True)
+#os.makedirs(settings.INPUT_DIR, exist_ok=True)
+#os.makedirs(settings.OUTPUT_DIR, exist_ok=True)
+
+os.makedirs("/tmp/input", exist_ok=True)
+os.makedirs("/tmp/output", exist_ok=True)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
