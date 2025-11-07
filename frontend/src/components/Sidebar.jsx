@@ -193,8 +193,12 @@ const Sidebar = ({
                 {result.mask_url && (
                   <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.mask_url}`} target="_blank" rel="noreferrer">Download Water Mask PNG</a>
                 )}
-                {result.rgb_jpg_url && (
+                {result.rgb_jpg_url ? (
                   <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.rgb_jpg_url}`} target="_blank" rel="noreferrer">Download RGB JPG</a>
+                ) : (
+                  result.rgb_url ? (
+                    <button type="button" onClick={onDownloadJPG} className="text-cyan-700 hover:underline text-left text-sm">Download RGB JPG</button>
+                  ) : null
                 )}
                 {result.rgb_tif_url && (
                   <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.rgb_tif_url}`} target="_blank" rel="noreferrer">Download RGB GeoTIFF</a>

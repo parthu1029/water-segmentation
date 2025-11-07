@@ -140,6 +140,7 @@ function App() {
     setIsDownloadingJPG(true);
     try {
       let jpgUrl = result?.rgb_jpg_url;
+      let pngUrl = result?.rgb_url;
       if (!jpgUrl) {
         const geojson = drawnPolygon.toGeoJSON();
         const body = { ...geojson, date: selectedDate, max_cloud: maxCloud, jpg_only: true, fast_jpg: !!fastJpg };
@@ -154,6 +155,7 @@ function App() {
         }
         const data = await resp.json();
         jpgUrl = data?.results?.rgb_jpg_url;
+        pngUrl = pngUrl || data?.results?.rgb_url;
       }
       if (jpgUrl) {
         const abs = jpgUrl.startsWith('http') ? jpgUrl : `${API_BASE}${jpgUrl}`;
@@ -163,6 +165,39 @@ function App() {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+      } else if (pngUrl) {
+        // Fallback: convert PNG to JPG client-side via Canvas
+        const src = pngUrl.startsWith('http') ? pngUrl : `${API_BASE}${pngUrl}`;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const load = () => new Promise((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error('Failed to load PNG for conversion'));
+          img.src = src;
+        });
+        await load();
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const blob = await new Promise((resolve, reject) => {
+          try {
+            canvas.toBlob((b) => {
+              if (b) resolve(b); else reject(new Error('Canvas conversion failed'));
+            }, 'image/jpeg', 0.9);
+          } catch (e) {
+            reject(e);
+          }
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'selected_region.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       } else {
         throw new Error('JPG not available');
       }
