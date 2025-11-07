@@ -4,7 +4,7 @@ import MapComponent from './components/MapComponent.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Topbar from './components/Topbar.jsx';
 import './index.css';
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+
 function App() {
   const mapRef = useRef(null);
   const [drawnPolygon, setDrawnPolygon] = useState(null);
@@ -40,7 +40,7 @@ function App() {
     setSaveMessage(null);
     try {
       const geojson = drawnPolygon.toGeoJSON();
-      const resp = await fetch(`${API_BASE}/api/v1/roi/store-geo-cordinate`, {
+      const resp = await fetch('http://localhost:8000/api/v1/roi/store-geo-cordinate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(geojson),
@@ -87,7 +87,7 @@ function App() {
   const checkHealth = async () => {
     try {
       setBackendStatus('checking');
-      const r = await fetch(`${API_BASE}/api/v1/health/`);
+      const r = await fetch('http://localhost:8000/api/v1/health');
       if (!r.ok) throw new Error('offline');
       const j = await r.json();
       setBackendStatus(j.status === 'healthy' ? 'online' : 'offline');
@@ -102,7 +102,7 @@ function App() {
 
   const handlePolygonDrawn = (layer) => {
     setDrawnPolygon(layer);
-    // Auto-run analyze when a polygon is drawn
+    // Auto-run analyze as soon as user completes drawing or editing
     handleAnalyze(selectedDate, layer);
   };
 
@@ -115,8 +115,9 @@ function App() {
 
     try {
       const geojson = layer.toGeoJSON();
-      const body = { ...geojson, date: (dateOverride || selectedDate), max_cloud: maxCloud };
-      const resp = await fetch(`${API_BASE}/api/v1/segmentation/predict`, {
+      const dateValue = (typeof dateOverride === 'string' && dateOverride) ? dateOverride : selectedDate;
+      const body = { ...geojson, date: dateValue, max_cloud: maxCloud };
+      const resp = await fetch('http://localhost:8000/api/v1/segmentation/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -143,7 +144,7 @@ function App() {
       if (!jpgUrl) {
         const geojson = drawnPolygon.toGeoJSON();
         const body = { ...geojson, date: selectedDate, max_cloud: maxCloud, jpg_only: true, fast_jpg: !!fastJpg };
-        const resp = await fetch(`${API_BASE}/api/v1/segmentation/predict`, {
+        const resp = await fetch('http://localhost:8000/api/v1/segmentation/predict', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -156,13 +157,18 @@ function App() {
         jpgUrl = data?.results?.rgb_jpg_url;
       }
       if (jpgUrl) {
-        const abs = jpgUrl.startsWith('http') ? jpgUrl : `${API_BASE}${jpgUrl}`;
+        const abs = jpgUrl.startsWith('http') ? jpgUrl : `http://localhost:8000${jpgUrl}`;
+        const fileResp = await fetch(abs, { mode: 'cors' });
+        if (!fileResp.ok) throw new Error(`Failed to fetch JPG: ${fileResp.status}`);
+        const blob = await fileResp.blob();
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = abs;
+        a.href = url;
         a.download = 'selected_region.jpg';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       } else {
         throw new Error('JPG not available');
       }
@@ -203,7 +209,7 @@ function App() {
           onDateChange={setSelectedDate}
           maxCloud={maxCloud}
           onMaxCloudChange={setMaxCloud}
-          onAnalyze={handleAnalyze}
+          onAnalyze={() => handleAnalyze()}
           onClear={handleClear}
           result={result}
           isLoading={isLoading}

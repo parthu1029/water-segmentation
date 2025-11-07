@@ -1,5 +1,5 @@
 import React from 'react';
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
 const Sidebar = ({
   collapsed,
   onToggleCollapse,
@@ -191,16 +191,16 @@ const Sidebar = ({
             </div>
               <div className="flex flex-col gap-2">
                 {result.mask_url && (
-                  <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.mask_url}`} target="_blank" rel="noreferrer">Download Water Mask PNG</a>
+                  <a className="text-cyan-700 hover:underline text-sm" href={`http://localhost:8000${result.mask_url}`} target="_blank" rel="noreferrer">Download Water Mask PNG</a>
                 )}
                 {result.rgb_jpg_url && (
-                  <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.rgb_jpg_url}`} target="_blank" rel="noreferrer">Download RGB JPG</a>
+                  <a className="text-cyan-700 hover:underline text-sm" href={`http://localhost:8000${result.rgb_jpg_url}`} target="_blank" rel="noreferrer">Download RGB JPG</a>
                 )}
                 {result.rgb_tif_url && (
-                  <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.rgb_tif_url}`} target="_blank" rel="noreferrer">Download RGB GeoTIFF</a>
+                  <a className="text-cyan-700 hover:underline text-sm" href={`http://localhost:8000${result.rgb_tif_url}`} target="_blank" rel="noreferrer">Download RGB GeoTIFF</a>
                 )}
                 {result.ndwi_tif_url && (
-                  <a className="text-cyan-700 hover:underline text-sm" href={`${API_BASE}${result.ndwi_tif_url}`} target="_blank" rel="noreferrer">Download NDWI GeoTIFF</a>
+                  <a className="text-cyan-700 hover:underline text-sm" href={`http://localhost:8000${result.ndwi_tif_url}`} target="_blank" rel="noreferrer">Download NDWI GeoTIFF</a>
                 )}
               </div>
             </div>
