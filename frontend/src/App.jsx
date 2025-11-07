@@ -4,9 +4,7 @@ import MapComponent from './components/MapComponent.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Topbar from './components/Topbar.jsx';
 import './index.css';
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-
 function App() {
   const mapRef = useRef(null);
   const [drawnPolygon, setDrawnPolygon] = useState(null);

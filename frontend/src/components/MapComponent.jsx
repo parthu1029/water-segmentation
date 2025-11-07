@@ -3,9 +3,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
-
+ 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-
 const MapComponent = ({ onMapLoad, onPolygonDrawn, result, maskOpacity = 0.6, resetSignal, showRgbOverlay = true, showMaskOverlay = true, onRegisterActions, selectedDate, maxCloud = 30 }) => {
   const mapRef = useRef(null);
   const containerRef = useRef(null);

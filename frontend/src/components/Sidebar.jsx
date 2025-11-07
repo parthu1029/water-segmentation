@@ -1,7 +1,5 @@
 import React from 'react';
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-
 const Sidebar = ({
   collapsed,
   onToggleCollapse,
